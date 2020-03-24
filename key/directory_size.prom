@@ -1,0 +1,8 @@
+# HELP example Metric read from /some/path/textfile/example.prom
+# TYPE example untyped
+example 1
+
+# TYPE avg untyped
+
+avg{aa} 1
+

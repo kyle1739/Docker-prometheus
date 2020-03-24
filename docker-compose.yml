@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.16.0
+    restart: always
+    volumes:
+     - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+    ports:
+     - "9090:9090"
+    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+
+  pushgateway:
+    image: prom/pushgateway
+    restart: always
+    ports:
+     - "9091:9091"
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v0.18.1
+    restart: always
+    volumes:
+     - "./key:/etc/node-exporter"
+    command:
+     - "--collector.textfile.directory=/etc/node-exporter/"
+    ports:
+     - "9100:9100"
+
+       #  blackbox-exporter:
+       #    image: prom/blackbox-exporter:v0.16.0
+       #    restart: always
+       #    volumes:
+       #     - "./blackbox/blackbox.yml:/config/blackbox.yml"
+       #    command:
+       #     - "--config.file=/config/blackbox.yml"
+       #    ports:
+       #    - "9115:9115"
+       
+  cAdvisor:
+    image: google/cadvisor:v0.33.0
+    restart: always
+    volumes:
+     - "/:/rootfs:ro"
+     - "/var/run:/var/run:rw"
+     - "/sys:/sys:ro"
+     - "/var/lib/docker/:/var/lib/docker:ro"
+    ports:
+     - "9101:8080"
+    environment:   
+     - "TZ=Asia/Taipei"
+  
+  ping_exporter:
+    image: czerwonk/ping_exporter
+    restart: always
+    volumes:
+     - "./ping_exporter/config/ping.yaml:/config:ro"  
+    ports:
+     - "9102:9427" 
+  grafana:
+    image: grafana/grafana:6.7.0
+    restart: always
+    volumes:
+     - "./grafana/data:/var/lib/grafana"
+    ports:
+     - "3000:3000"
+    environment:
+     - "GF_SECURITY_ADMIN_PASSWORD=admin"

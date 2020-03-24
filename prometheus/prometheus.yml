@@ -1,0 +1,120 @@
+# my global config
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'pushgateway'
+    static_configs:
+      - targets: ['192.168.50.18:9091']
+        labels:
+          instance: pushgateway 
+
+  - job_name: "192.168.50.18"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.18:9100', '192.168.50.18:9101', '192.168.50.18:9102']
+        labels:
+          instance: node-18
+
+  - job_name: "192.168.50.9"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.9:9100', '192.168.50.9:9101', '192.168.50.9:9102']
+        labels:
+          instance: node-09
+ 
+  - job_name: "192.168.50.10"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.10:9100', '192.168.50.10:9101',  '192.168.50.10:9102']
+        labels:
+          instance: node-10
+
+  - job_name: "192.168.50.12"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.12:9100', '192.168.50.12:9101','192.168.50.12:9102']
+        labels:
+          instance: node-12
+
+  - job_name: "192.168.50.13"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.13:9100', '192.168.50.13:9101', '192.168.50.13:9102']
+        labels:
+          instance: node-13
+
+  - job_name: "192.168.50.14"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.14:9100', '192.168.50.14:9101', '192.168.50.14:9102']
+        labels:
+          instance: node-14
+
+  - job_name: "192.168.50.15"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.15:9100', '192.168.50.15:9101', '192.168.50.15:9102']
+        labels:
+          instance: node-15
+
+  - job_name: "192.168.50.16"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.16:9100', '192.168.50.16:9101', '192.168.50.16:9102']
+        labels:
+          instance: node-16
+
+  - job_name: "192.168.50.17"
+    scrape_interval: "30s"
+    static_configs:
+      - targets: ['192.168.50.17:9100', '192.168.50.17:9101','192.168.50.17:9102']
+        labels:
+          instance: node-17
+  - job_name: "ping_all"
+    scrape_interval: "30s"
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+      - targets: ['192.168.50.9', '192.168.50.10', '192.168.50.12', '192.168.50.13', '192.168.50.14', '192.168.50.15', '192.168.50.16', '192.168.50.17']
+        labels:
+          group: 'Alpha'
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: (.*)(:80)?
+        target_label: __param_target
+        replacement: ${1}
+      - source_labels: [__param_target]
+        regex: (.*)
+        target_label: ping
+        replacement: ${1}
+      - source_labels: []
+        regex: .*
+        target_label: __address__
+        replacement: 192.168.50.18:9115 
